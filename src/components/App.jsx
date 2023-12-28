@@ -1,16 +1,28 @@
-export const App = () => {
-  return (
-    <div
-      style={{
-        height: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        fontSize: 40,
-        color: '#010101'
-      }}
-    >
-      React homework template
-    </div>
-  );
-};
+import { Component } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+
+import 'react-toastify/dist/ReactToastify.css';
+import { Searchbar } from './Searchbar/Searchbar';
+
+export class App extends Component {
+  state = {
+    query: '',
+    status: 'idle',
+  };
+
+  // "idle"
+  // "pending"
+  // "resolved"
+  // "rejected"
+  searchSubmit = query => {
+    this.setState({ query });
+  };
+
+  render() {
+    return (
+      <div className='app'>
+        <Searchbar onSubmit={this.searchSubmit}/>
+      </div>
+    );
+  }
+}
