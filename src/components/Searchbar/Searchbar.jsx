@@ -7,6 +7,7 @@ import {
   SearchFormInput,
 } from './Searchbar.styled';
 import { ImSearch } from 'react-icons/im';
+import { toast } from 'react-toastify';
 
 export class Searchbar extends Component {
   state = {
@@ -15,6 +16,9 @@ export class Searchbar extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
+    if (this.state.query.trim() === '') {
+      return toast.error('Введите запрос!');
+    }
     this.props.onSubmit(this.state.query);
     this.setState({ query: '' });
   };
@@ -29,15 +33,15 @@ export class Searchbar extends Component {
         <SearchForm onSubmit={this.handleSubmit}>
           <SearchFormButton type="submit">
             <ImSearch size={'20px'} />
-            {/* <SearchFormButtonLabel >
+            <SearchFormButtonLabel >
               Search
-            </SearchFormButtonLabel> */}
+            </SearchFormButtonLabel>
           </SearchFormButton>
 
           <SearchFormInput
             type="text"
-            autocomplete="off"
-            autofocus
+            autoComplete="off"
+            autoFocus
             placeholder="Search images and photos"
             value={this.state.query}
             onChange={this.handleChange}
