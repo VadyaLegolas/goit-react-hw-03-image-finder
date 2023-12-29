@@ -3,18 +3,14 @@ import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
 import { toast } from 'react-toastify';
 import { Gallery } from './ImageGallery.styled';
 import { fetchPhotos } from '../services/pixabay-api';
+import { Loader } from 'components/Loader/Loader';
 
 export class ImageGallery extends Component {
   state = {
     gallery: null,
-    status: 'idle',
+    status: 'pending',
     error: null,
-    page: 1,
   };
-  // "idle"
-  // "pending"
-  // "resolved"
-  // "rejected"
 
   componentDidMount = () => {
     this.getPhotos('', 'false');
@@ -29,23 +25,24 @@ export class ImageGallery extends Component {
     }
   }
 
-  getPhotos = (query, messages='true') => {
-    fetchPhotos(query)
-      .then(gallery => {
-        if (gallery.totalHits === 0) {
-          throw new Error(`Ничего не найдено по запросу "${query}"`);
-        }
-        if (messages === 'true') {
-          toast.success(`Найдено ${gallery.totalHits} картинок`);
-        }
-        
-        this.setState({
-          gallery,
-          status: 'resolved',
-          page: this.state.page + 1,
-        });
-      })
-      .catch(err => this.setState({ error: err.message, status: 'rejected' }));
+  getPhotos = async (query, messages = 'true') => {
+    try {
+      this.setState({ page: 1 });
+      const gallery = await fetchPhotos(query, this.state.page);
+      if (gallery.totalHits === 0) {
+        throw new Error(`Ничего не найдено по запросу "${query}"`);
+      }
+      if (messages === 'true') {
+        toast.success(`Найдено ${gallery.totalHits} картинок`);
+      }
+
+      this.setState({
+        gallery,
+        status: 'resolved',
+      });
+    } catch (err) {
+      this.setState({ error: err.message, status: 'rejected' });
+    }
   };
 
   render() {
@@ -56,7 +53,7 @@ export class ImageGallery extends Component {
     // }
 
     if (status === 'pending') {
-      return <div>Загружаю</div>;
+      return <Loader />;
     }
 
     if (status === 'resolved') {

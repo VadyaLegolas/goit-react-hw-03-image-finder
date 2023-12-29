@@ -7,14 +7,14 @@ axios.defaults.headers.common['x-api-key'] = API_KEY;
 
 // https://pixabay.com/api/?q=cat&page=1&key=your_key&image_type=photo&orientation=horizontal&per_page=12
 
-export async function fetchPhotos(query) {
+export async function fetchPhotos(query, page) {
   const params = new URLSearchParams({
     key: API_KEY,
     q: query,
     image_type: 'photo',
     orientation: 'horizontal',
     safesearch: true,
-    page: 1,
+    page: page,
     per_page: 12,
   });
   const url = `${BASE_URL}?${params}`;

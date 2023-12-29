@@ -1,13 +1,9 @@
+import { LoadMoreButton } from './Button.styled';
 
-import { ButtonLabel, ButtonStyled } from './Button.styled';
-
-export const Button = ({ children }) => {
+export const Button = () => {
   return (
-    <ButtonStyled type="submit">
-        
-      <ButtonLabel>
-        {children}
-      </ButtonLabel>
-    </ButtonStyled>
+    <LoadMoreButton type="button">
+      LoadMore
+    </LoadMoreButton>
   );
 };

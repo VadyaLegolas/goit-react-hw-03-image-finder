@@ -1,32 +1,27 @@
 import styled from 'styled-components';
 
-export const ButtonStyled = styled.button`
+export const LoadMoreButton = styled.button`
+  padding: 8px 16px;
+  border-radius: 2px;
+  background-color: #3f51b5;
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
   display: inline-block;
-  width: 48px;
-  height: 48px;
+  color: #fff;
   border: 0;
-/*   
-  background-size: 40%;
-  background-repeat: no-repeat;
-  background-position: center; */
-  opacity: 0.6;
-  transition: opacity 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
   cursor: pointer;
-  outline: none;
+  font-family: inherit;
+  font-size: 18px;
+  line-height: 24px;
+  font-style: normal;
+  font-weight: 500;
+  min-width: 180px;
+  box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
 
-  &:hover {
-    opacity: 1;
+  &:hover,
+  &:focus {
+    background-color: #303f9f;
   }
-`;
-
-export const ButtonLabel = styled.span`
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  clip-path: inset(50%);
-  border: 0;
 `;
