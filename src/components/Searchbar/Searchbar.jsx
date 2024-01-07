@@ -20,7 +20,7 @@ export class Searchbar extends Component {
       return toast.error('Введите запрос!');
     }
     this.props.onSubmit(this.state.query);
-    this.setState({ query: '' });
+    // this.setState({ query: '' });
   };
 
   handleChange = e => {

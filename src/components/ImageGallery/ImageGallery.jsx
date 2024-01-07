@@ -4,15 +4,22 @@ import { toast } from 'react-toastify';
 import { Gallery } from './ImageGallery.styled';
 import { fetchPhotos } from '../services/pixabay-api';
 import { Loader } from 'components/Loader/Loader';
+import { Button } from 'components/Button/Button';
+import { Modal } from 'components/Modal/Modal';
 
 export class ImageGallery extends Component {
   state = {
     gallery: null,
-    status: 'pending',
     error: null,
+    isLoading: false,
+    showModal: false,
+    isLoadMore: false,
+    selectedImage: null,
+    page: 1,
   };
 
   componentDidMount = () => {
+    this.setState({ isLoading: true });
     this.getPhotos('', 'false');
   };
 
@@ -20,7 +27,7 @@ export class ImageGallery extends Component {
     const prevQuery = prevProps.query;
     const nextQuery = this.props.query;
     if (prevQuery !== nextQuery) {
-      this.setState({ status: 'pending' });
+      this.setState({ isLoading: true, gallery: null });
       this.getPhotos(nextQuery);
     }
   }
@@ -38,38 +45,52 @@ export class ImageGallery extends Component {
 
       this.setState({
         gallery,
-        status: 'resolved',
+        isLoading: false,
       });
     } catch (err) {
-      this.setState({ error: err.message, status: 'rejected' });
+      this.setState({ error: err.message, isLoading: false });
     }
   };
 
+  tongleModal = () => {
+    this.setState(({ showModal }) => ({
+      showModal: !showModal,
+    }));
+  };
+
+  addImgeToModal = item => {
+    this.setState({ selectedImage: item });
+    this.tongleModal();
+  };
+
   render() {
-    const { status, gallery, error } = this.state;
+    const { gallery, error, isLoadMore, isLoading, showModal, selectedImage } =
+      this.state;
 
-    // if (status === 'idle') {
-    //   return <h1>Введите запрос для поиска</h1>;
-    // }
-
-    if (status === 'pending') {
-      return <Loader />;
-    }
-
-    if (status === 'resolved') {
-      return (
-        <Gallery className="gallery">
-          {gallery.hits.map(({ id, webformatURL, tags }) => {
-            return (
-              <ImageGalleryItem key={id} image={webformatURL} tag={tags} />
-            );
-          })}
-        </Gallery>
-      );
-    }
-
-    if (status === 'rejected') {
-      return <h1>{error}</h1>;
-    }
+    return (
+      <>
+        {isLoading && <Loader />}
+        {showModal && (
+          <Modal image={selectedImage} onClose={this.tongleModal} />
+        )}
+        {error && <h1>{error}</h1>}
+        {gallery && (
+          <Gallery className="gallery">
+            {gallery.hits.map(({ id, webformatURL, tags, largeImageURL }) => {
+              return (
+                <ImageGalleryItem
+                  key={id}
+                  image={webformatURL}
+                  tag={tags}
+                  largeImage={largeImageURL}
+                  onClick={this.addImgeToModal}
+                />
+              );
+            })}
+          </Gallery>
+        )}
+        {isLoadMore && <Button />}
+      </>
+    );
   }
 }

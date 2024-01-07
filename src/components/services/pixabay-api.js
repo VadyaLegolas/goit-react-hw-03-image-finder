@@ -4,6 +4,7 @@ const BASE_URL = 'https://pixabay.com/api/';
 const API_KEY = '39645635-7da43b24dbf787654135e35eb';
 
 axios.defaults.headers.common['x-api-key'] = API_KEY;
+axios.defaults.baseURL = BASE_URL
 
 // https://pixabay.com/api/?q=cat&page=1&key=your_key&image_type=photo&orientation=horizontal&per_page=12
 
