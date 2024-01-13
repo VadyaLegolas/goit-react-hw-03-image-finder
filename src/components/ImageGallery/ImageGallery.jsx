@@ -43,7 +43,7 @@ export class ImageGallery extends Component {
     if (prevQuery !== nextQuery) {
       this.setState({ isLoading: true, gallery: null, page: 1 });
 
-      this.getPhotos(nextQuery, this.state.page);
+      this.getPhotos(nextQuery);
       // this.setState({ page: prevState.page + 1 });
     }
   }
@@ -94,7 +94,7 @@ export class ImageGallery extends Component {
     this.setState(prevState => {
       return { page: prevState.page + 1, isLoading: true };
     });
-    this.getPhotos(this.props.query, this.state.page, false);
+    this.getPhotos(this.props.query, this.state.page+1, false);
   };
 
   render() {
