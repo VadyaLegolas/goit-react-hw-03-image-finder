@@ -13,42 +13,69 @@ export class ImageGallery extends Component {
     error: null,
     isLoading: false,
     showModal: false,
-    isLoadMore: false,
+    isLoadMore: true,
     selectedImage: null,
     page: 1,
   };
 
-  componentDidMount = () => {
+  componentDidMount = async () => {
+    console.log('mount')
     this.setState({ isLoading: true });
-    this.getPhotos('', 'false');
+    try {
+      const gallery = await fetchPhotos('', 1);
+
+      this.setState({
+        gallery: { totalHits: gallery.totalHits, hits: [...gallery.hits] },
+      });
+    } catch (err) {
+      this.setState({ error: err.message });
+    } finally {
+      this.setState({ isLoading: false });
+    }
+    // this.setState({ isLoading: true, page: 1, gallery: null });
+    // this.getPhotos('', this.state.page, false);
   };
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
+    console.log('update')
     const prevQuery = prevProps.query;
     const nextQuery = this.props.query;
     if (prevQuery !== nextQuery) {
-      this.setState({ isLoading: true, gallery: null });
-      this.getPhotos(nextQuery);
+      this.setState({ isLoading: true, gallery: null, page: 1 });
+
+      this.getPhotos(nextQuery, this.state.page);
+      // this.setState({ page: prevState.page + 1 });
     }
   }
 
-  getPhotos = async (query, messages = 'true') => {
+  getPhotos = async (query, page, messages = 'true') => {
     try {
-      this.setState({ page: 1 });
-      const gallery = await fetchPhotos(query, this.state.page);
+      const gallery = await fetchPhotos(query, page);
       if (gallery.totalHits === 0) {
         throw new Error(`Ничего не найдено по запросу "${query}"`);
       }
       if (messages === 'true') {
         toast.success(`Найдено ${gallery.totalHits} картинок`);
       }
-
-      this.setState({
-        gallery,
-        isLoading: false,
-      });
+      if (this.state.gallery) {
+        this.setState(prevState => {
+          return {
+            gallery: {
+              totalHits: gallery.totalHits,
+              hits: [...prevState.gallery.hits, ...gallery.hits],
+            },
+            isLoading: false,
+          };
+        });
+      } else {
+        this.setState({
+          gallery: { totalHits: gallery.totalHits, hits: [...gallery.hits] },
+        });
+      }
     } catch (err) {
-      this.setState({ error: err.message, isLoading: false });
+      this.setState({ error: err.message });
+    } finally {
+      this.setState({ isLoading: false });
     }
   };
 
@@ -58,9 +85,16 @@ export class ImageGallery extends Component {
     }));
   };
 
-  addImgeToModal = item => {
+  addImageToModal = item => {
     this.setState({ selectedImage: item });
     this.tongleModal();
+  };
+
+  loadMore = () => {
+    this.setState(prevState => {
+      return { page: prevState.page + 1, isLoading: true };
+    });
+    this.getPhotos(this.props.query, this.state.page, false);
   };
 
   render() {
@@ -69,7 +103,6 @@ export class ImageGallery extends Component {
 
     return (
       <>
-        {isLoading && <Loader />}
         {showModal && (
           <Modal image={selectedImage} onClose={this.tongleModal} />
         )}
@@ -83,13 +116,14 @@ export class ImageGallery extends Component {
                   image={webformatURL}
                   tag={tags}
                   largeImage={largeImageURL}
-                  onClick={this.addImgeToModal}
+                  onClick={this.addImageToModal}
                 />
               );
             })}
           </Gallery>
         )}
-        {isLoadMore && <Button />}
+        {isLoading && <Loader />}
+        {isLoadMore && <Button onLoadMore={this.loadMore}>LoadMore</Button>}
       </>
     );
   }
