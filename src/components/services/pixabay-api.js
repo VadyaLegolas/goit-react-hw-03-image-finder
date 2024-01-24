@@ -8,6 +8,7 @@ export default class PhotosApiService {
     this.searchQuery = '';
     this.page = 1;
     this.perPage = 12;
+    this.totalPages = 0;
   }
 
   get query() {
@@ -18,6 +19,13 @@ export default class PhotosApiService {
     this.searchQuery = newQuery;
   }
 
+  get pages() {
+    return this.totalPages;
+  }
+
+  set pages(newTotalPages) {
+    this.totalPages = newTotalPages;
+  }
   async fetchPhotos() {
     const params = new URLSearchParams({
       key: API_KEY,

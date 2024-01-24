@@ -5,7 +5,6 @@ import { ModalImage, ModalWindow, Overlay } from './Modal.styled';
 const modalRoot = document.querySelector('#modal-root');
 
 export class Modal extends Component {
-  // state = {};
   componentDidMount = () => {
     window.addEventListener('keydown', this.handlePressESC);
   };

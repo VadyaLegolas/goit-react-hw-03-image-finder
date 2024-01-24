@@ -13,9 +13,8 @@ export class ImageGallery extends Component {
     error: null,
     isLoading: false,
     showModal: false,
-    isLoadMore: true,
+    isLoadMore: false,
     selectedImage: null,
-    page: 1,
   };
 
   photosApiService = new PhotosApiService();
@@ -23,6 +22,7 @@ export class ImageGallery extends Component {
   async componentDidMount() {
     this.setState({ isLoading: true });
     await this.getPhotos('', false);
+    // this.showLoadMore();
   }
 
   async componentDidUpdate(prevProps) {
@@ -32,12 +32,14 @@ export class ImageGallery extends Component {
       this.setState({ isLoading: true, gallery: null });
       this.photosApiService.resetPage();
       await this.getPhotos(nextQuery);
+      // this.showLoadMore();
     }
   }
 
   getPhotos = async (query, messages = 'true') => {
     try {
       this.photosApiService.query = query;
+      this.setState({isLoadMore:false})
       const gallery = await this.photosApiService.fetchPhotos();
       if (gallery.totalHits === 0) {
         throw new Error(`Ничего не найдено по запросу "${query}"`);
@@ -52,7 +54,6 @@ export class ImageGallery extends Component {
               totalHits: gallery.totalHits,
               hits: [...prevState.gallery.hits, ...gallery.hits],
             },
-            isLoading: false,
           };
         });
       } else {
@@ -60,10 +61,28 @@ export class ImageGallery extends Component {
           gallery: { totalHits: gallery.totalHits, hits: [...gallery.hits] },
         });
       }
+      this.photosApiService.pages = Math.ceil(gallery.totalHits / this.photosApiService.perPage)
+      if (this.photosApiService.totalPages >1) {
+        this.setState({isLoadMore:true})
+      }    
+      
     } catch (err) {
       this.setState({ error: err.message });
     } finally {
       this.setState({ isLoading: false });
+    }
+  };
+
+  showLoadMore = () => {
+    const { gallery } = this.state;
+    let totalPages = 0;
+    if (gallery) {
+      totalPages = Math.ceil(gallery.totalHits / this.photosApiService.perPage);
+    }else{totalPages=1}
+
+    console.log(totalPages);
+    if (totalPages > 1) {
+      this.setState({ isloadMore: true });
     }
   };
 
@@ -80,7 +99,7 @@ export class ImageGallery extends Component {
 
   loadMore = () => {
     this.setState({ isLoading: true });
-    this.getPhotos(this.props.query,false);
+    this.getPhotos(this.props.query, false);
   };
 
   render() {
