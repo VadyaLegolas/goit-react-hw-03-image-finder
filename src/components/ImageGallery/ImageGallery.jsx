@@ -20,29 +20,24 @@ export class ImageGallery extends Component {
 
   photosApiService = new PhotosApiService();
 
-  async componentDidMount (){
-    console.log("mount")
-    this.setState({ isLoading: true, gallery:null });
-    await this.getPhotos(false);
-  };
+  async componentDidMount() {
+    this.setState({ isLoading: true });
+    await this.getPhotos('', false);
+  }
 
-  componentDidUpdate(prevProps, prevState) {
+  async componentDidUpdate(prevProps) {
     const prevQuery = prevProps.query;
     const nextQuery = this.props.query;
     if (prevQuery !== nextQuery) {
       this.setState({ isLoading: true, gallery: null });
-
-      // this.getPhotos(nextQuery);
-      // this.setState({ page: prevState.page + 1 });
+      this.photosApiService.resetPage();
+      await this.getPhotos(nextQuery);
     }
   }
 
-  getPhotos = async (messages = 'true') => {
+  getPhotos = async (query, messages = 'true') => {
     try {
-      const query = 'cat';
       this.photosApiService.query = query;
-      console.log('this.photosApiService.query: ', this.photosApiService.query);
-
       const gallery = await this.photosApiService.fetchPhotos();
       if (gallery.totalHits === 0) {
         throw new Error(`Ничего не найдено по запросу "${query}"`);
@@ -84,10 +79,8 @@ export class ImageGallery extends Component {
   };
 
   loadMore = () => {
-    this.setState(prevState => {
-      return { page: prevState.page + 1, isLoading: true };
-    });
-    this.getPhotos(this.props.query, this.state.page + 1, false);
+    this.setState({ isLoading: true });
+    this.getPhotos(false);
   };
 
   render() {
