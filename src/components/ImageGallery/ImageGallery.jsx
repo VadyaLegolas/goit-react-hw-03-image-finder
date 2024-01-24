@@ -80,7 +80,7 @@ export class ImageGallery extends Component {
 
   loadMore = () => {
     this.setState({ isLoading: true });
-    this.getPhotos(false);
+    this.getPhotos(this.props.query,false);
   };
 
   render() {
