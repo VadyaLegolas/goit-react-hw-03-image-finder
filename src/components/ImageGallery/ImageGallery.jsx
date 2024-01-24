@@ -66,7 +66,6 @@ export class ImageGallery extends Component {
       if (this.photosApiService.totalPages > 1) {
         this.setState({ isLoadMore: true });
       }
-      console.log(this.photosApiService.totalPages);
       if (this.photosApiService.page === this.photosApiService.totalPages + 1) {
         this.setState({ isLoadMore: false });
       }
