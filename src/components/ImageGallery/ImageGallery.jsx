@@ -15,37 +15,43 @@ export class ImageGallery extends Component {
     showModal: false,
     isLoadMore: false,
     selectedImage: null,
+    page: 1,
   };
 
   photosApiService = new PhotosApiService();
 
-  async componentDidMount() {
-    this.setState({ isLoading: true });
-    await this.getPhotos('', false);
-    // this.showLoadMore();
-  }
+  // async componentDidMount() {
+  //   this.setState({ isLoading: true });
+  //   await this.getPhotos('', false);
+  // }
 
-  async componentDidUpdate(prevProps) {
+  async componentDidUpdate(prevProps, prevState) {
     const prevQuery = prevProps.query;
     const nextQuery = this.props.query;
     if (prevQuery !== nextQuery) {
-      this.setState({ isLoading: true, gallery: null });
-      this.photosApiService.resetPage();
-      await this.getPhotos(nextQuery);
+      this.setState({ isLoading: true, gallery: null, page: 1 });
+
+      await this.getPhotos(nextQuery, this.state.page);
+    }
+    if (prevState.page !== this.state.page) {
+      this.setState({ isLoading: true });
+      await this.getPhotos(nextQuery, this.state.page, false);
     }
   }
 
-  getPhotos = async (query, messages = 'true') => {
+  getPhotos = async (query, page, message = true) => {
     try {
       this.photosApiService.query = query;
+      this.photosApiService.page = page;
       this.setState({ isLoadMore: false });
       const gallery = await this.photosApiService.fetchPhotos();
       if (gallery.totalHits === 0) {
         throw new Error(`Ничего не найдено по запросу "${query}"`);
       }
-      if (messages === 'true') {
+      if (message) {
         toast.success(`Найдено ${gallery.totalHits} картинок`);
       }
+
       if (this.state.gallery) {
         this.setState(prevState => {
           return {
@@ -60,7 +66,7 @@ export class ImageGallery extends Component {
           gallery: { totalHits: gallery.totalHits, hits: [...gallery.hits] },
         });
       }
-      this.photosApiService.total = Math.ceil(
+      this.photosApiService.totalPages = Math.ceil(
         gallery.totalHits / this.photosApiService.perPage
       );
       if (this.photosApiService.totalPages > 1) {
@@ -88,13 +94,19 @@ export class ImageGallery extends Component {
   };
 
   loadMore = () => {
-    this.setState({ isLoading: true });
-    this.getPhotos(this.props.query, false);
+    // this.setState({ isLoading: true });
+    // this.getPhotos(this.props.query, false);
+    this.setState(prevState => {
+      return {
+        page: prevState.page + 1,
+      };
+    });
   };
 
   render() {
     const { gallery, error, isLoadMore, isLoading, showModal, selectedImage } =
       this.state;
+    console.log(this.state.page);
 
     return (
       <>

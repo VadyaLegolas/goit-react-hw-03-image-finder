@@ -6,9 +6,9 @@ const API_KEY = '39645635-7da43b24dbf787654135e35eb';
 export default class PhotosApiService {
   constructor() {
     this.searchQuery = '';
-    this.page = 1;
+    this.pageNumber = 1;
     this.perPage = 12;
-    this.totalPages = 1;
+    this.totalPageNumbers = 1;
   }
 
   get query() {
@@ -19,12 +19,19 @@ export default class PhotosApiService {
     this.searchQuery = newQuery;
   }
 
-  get total() {
-    return this.totalPages;
+  get page() {
+    return this.pageNumber;
+  }
+  set page(newPage) {
+    this.pageNumber = newPage;
   }
 
-  set total(newTotalPages) {
-    this.totalPages = newTotalPages;
+  get totalPages() {
+    return this.totalPageNumbers;
+  }
+
+  set totalPages(newTotalPages) {
+    this.totalPageNumbers = newTotalPages;
   }
   async fetchPhotos() {
     const params = new URLSearchParams({
@@ -42,7 +49,6 @@ export default class PhotosApiService {
     if (!res.ok) {
       throw new Error('Ошибка поиска, повторите позже!');
     }
-    this.incrementPage();
     return await res.json();
   }
 
