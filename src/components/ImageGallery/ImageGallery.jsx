@@ -33,7 +33,7 @@ export class ImageGallery extends Component {
 
     this.getPhotos(nextQuery, 1);
     }
-    if (prevState.page !== this.state.page && this.state.page !== 1) {
+    if (prevState.page < this.state.page) {
       this.setState({ isLoading: true });
       this.getPhotos(nextQuery, this.state.page, false);
     }
