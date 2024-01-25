@@ -25,17 +25,17 @@ export class ImageGallery extends Component {
   //   await this.getPhotos('', false);
   // }
 
-  async componentDidUpdate(prevProps, prevState) {
+   componentDidUpdate(prevProps, prevState) {
     const prevQuery = prevProps.query;
     const nextQuery = this.props.query;
     if (prevQuery !== nextQuery) {
       this.setState({ isLoading: true, gallery: null, page: 1 });
 
-      await this.getPhotos(nextQuery, 1);
+    this.getPhotos(nextQuery, 1);
     }
-    if (prevState.page !== this.state.page) {
+    if (prevState.page !== this.state.page && this.state.page !== 1) {
       this.setState({ isLoading: true });
-      await this.getPhotos(nextQuery, this.state.page, false);
+      this.getPhotos(nextQuery, this.state.page, false);
     }
   }
 
